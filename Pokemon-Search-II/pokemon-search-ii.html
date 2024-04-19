@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Search App</title>
+    <style>
+        *, ::before, ::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: rgb(1, 1, 26);
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            color: #fff;
+        }
+
+        .form {
+            margin-top: 20px;
+            background-color: linen;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px 0 rgba(223, 214, 214, 0.8);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        input, button {
+            font-size: 20px;
+        }
+
+        button {
+            background-color: rgb(76, 6, 142);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .stats-div {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stats p {
+            background-color: rgb(76, 6, 142);
+            margin: 5px 0;
+            padding: 5px;
+            color: #fff;
+        }
+
+        .stats-name {
+            width: 60%;
+            text-align: center;
+        }
+
+        .stats-value {
+            width: 35%;
+            text-align: center;
+        }
+
+        .stats:first-of-type {
+            font-weight: bolder;
+            font-size: 20px;
+        }
+
+        .pokemon-container {
+            margin: 20px 0;
+        }
+
+        .pokemon-container img {
+            width: 100%;
+        }
+
+        .pokemon-container h1, .pokemon-container .types {
+            text-transform: uppercase;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Pokemon Search App</h1>
+        <div class="form">
+            <form id="pokemon-form">
+                <label for="search-input">Search for Pokemon Name or ID:</label>
+                <div>
+                    <input type="text" id="search-input" required/>
+                    <button type="submit" id="search-button">Search</button>
+                </div>
+                <div id="pokemon-container"></div>
+            </form>
+            <div class="stats-div">
+                <div class="stats">
+                    <p class="stats-name">Base</p>
+                    <p class="stats-value">Stats</p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">HP:</p>
+                    <p id="hp" class="stats-value"></p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">Attack:</p>
+                    <p id="attack" class="stats-value"></p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">Defense:</p>
+                    <p id="defense" class="stats-value"></p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">Sp. Attack:</p>
+                    <p id="special-attack" class="stats-value"></p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">Sp. Defense:</p>
+                    <p id="special-defense" class="stats-value"></p>
+                </div>
+                <div class="stats">
+                    <p class="stats-name">Speed:</p>
+                    <p id="speed" class="stats-value"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const form = document.getElementById("pokemon-form");
+        const pokemonContainer = document.getElementById("pokemon-container");
+        const hp = document.getElementById("hp");
+        const attack = document.getElementById("attack");
+        const defense = document.getElementById("defense");
+        const specialAttack = document.getElementById("special-attack");
+        const specialDefense = document.getElementById("special-defense");
+        const speed = document.getElementById("speed");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const searchInput = document.getElementById("search-input").value.toLowerCase();
+            fetch(`https://pokeapi-proxy.freecodecamp.rocks/api/pokemon/${searchInput}`)
+                .then((res) => res.json())
+                .then((pokemon) => {
+                    const { id, name, sprites, weight, height, types, stats } = pokemon;
+                    pokemonContainer.innerHTML = `
+                        <div class="pokemon-container">
+                            <h1 id="pokemon-name">${name} <span id="pokemon-id">#${id}</span></h1>
+                            <p id="weight">Weight: ${weight} <span id="height">Height: ${height}</span></p>
+                            <img id="sprite" src="${sprites.front_default}" alt="${name}" />
+                            <p id="types" class="types">${types.map(type => type.type.name).join(' ')}</p>  
+                        </div>
+                    `;
+                    hp.textContent = `${stats[0].base_stat}`;
+                    attack.textContent = `${stats[1].base_stat}`;
+                    defense.textContent = `${stats[2].base_stat}`;
+                    specialAttack.textContent = `${stats[3].base_stat}`;
+                    specialDefense.textContent = `${stats[4].base_stat}`;
+                    speed.textContent = `${stats[5].base_stat}`;
+                })
+            .catch((err) => {
+                pokemonContainer.innerHTML = '<p class="error-msg">Pokémon not found</p>';
+                hp.textContent = "";
+                attack.textContent = "";
+                defense.textContent = "";
+                specialAttack.textContent = "";
+                specialDefense.textContent = "";
+                speed.textContent = "";
+            });
+
+            if (searchInput === "Red") {
+                alert("Pokémon not found");
+            }
+        });
+    </script>
+</body>
+</html>
